@@ -1,14 +1,16 @@
 "use client";
 
 import { supabase } from "@/services/supabaseClient";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext, useContext } from "react";
+
+export const UserContext = createContext(null);
 
 function Provider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event, session) => { 
         if (session?.user) {
           console.log("Auth state changed, user logged in:", session.user);
           await createNewUser(session.user);
@@ -94,7 +96,11 @@ function Provider({ children }) {
     }
   };
 
-  return <>{children}</>;
+  return (
+    <UserContext.Provider value={user}>
+      {children}
+    </UserContext.Provider>
+  );
 }
 
 export default Provider;
